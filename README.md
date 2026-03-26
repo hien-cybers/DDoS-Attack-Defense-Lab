@@ -44,7 +44,8 @@ Hệ thống sẽ ghi nhận các IP kết nối mới, nếu một IP gửi vư
 
 
 1. **Tấm khiên hoạt động (Nguyên nhân):** Lệnh `iptables -nL INPUT -v` xác nhận quy tắc Rate Limiting đã được kích hoạt. Nhìn vào cột `pkts DROP`, hệ thống đã bắt quả tang và âm thầm vứt bỏ hơn 13.000 gói tin tấn công vi phạm tốc độ (vượt ngưỡng 20 hits/s).
-<img width="1695" height="928" alt="8" src="https://github.com/user-attachments/assets/f9138c7b-4c80-4e49-b5dd-f1fc4f9c88f2" />
+
+<img width="1698" height="920" alt="Screenshot 2026-03-26 124754" src="https://github.com/user-attachments/assets/6dd0a037-5c4e-4700-8c0d-6698db1b9955" />
 
 
 2. **Hệ thống an toàn (Kết quả):** Nhờ Tường lửa chặn đứng "cơn lũ" từ vòng ngoài, bảng giám sát `htop` cho thấy CPU của Web Server lập tức được giải phóng. Mức ngốn CPU giảm mạnh từ 100% xuống chỉ còn 1-3%, chỉ số Load Average hạ nhiệt về mức cực kỳ an toàn (0.08). Web Server vẫn sống sót và phục vụ người dùng bình thường.
