@@ -57,8 +57,10 @@ Hệ thống sẽ ghi nhận các IP kết nối mới, nếu một IP gửi vư
 
 <img width="1682" height="908" alt="10" src="https://github.com/user-attachments/assets/20f4a3e4-12aa-45e3-9c3e-e11e656e5fbe" />
 
+
 **Cấu hình Iptables (Ubuntu 24.04):**
 ```bash
+
 # 1. Ghi nhận các kết nối mới vào cổng 80
 sudo iptables -I INPUT -p tcp -m tcp --dport 80 -m conntrack --ctstate NEW -m recent --set --name HTTP_LIMIT
 
