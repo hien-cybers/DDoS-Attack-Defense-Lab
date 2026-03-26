@@ -48,7 +48,8 @@ Hệ thống sẽ ghi nhận các IP kết nối mới, nếu một IP gửi vư
 
 1. **Tấm khiên hoạt động (Nguyên nhân):** Lệnh `iptables -nL INPUT -v` xác nhận quy tắc Rate Limiting đã được kích hoạt. Nhìn vào cột `pkts DROP`, hệ thống đã bắt quả tang và âm thầm vứt bỏ hơn 13.000 gói tin tấn công vi phạm tốc độ (vượt ngưỡng 20 hits/s).
 
-<img width="1695" height="928" alt="8" src="https://github.com/user-attachments/assets/cc39764f-46dd-4c0d-8819-263093e66988" />
+
+<img width="1085" height="281" alt="11" src="https://github.com/user-attachments/assets/0af8af39-3a29-4c85-b2af-6b7be8b000fc" />
 
 
 
