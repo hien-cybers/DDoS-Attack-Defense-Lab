@@ -199,15 +199,3 @@ sudo iptables -A INPUT -p tcp --dport 80 -m connlimit --connlimit-above 20 -j DR
   * `hping3`
   * `ab (Apache Benchmark)`
   * `locust`
-
----
-
-## 📌 Ghi chú
-
-Lab này phù hợp cho:
-
-* Sinh viên An toàn thông tin
-* Pentester (Junior → Mid)
-* DevOps / System Admin muốn hiểu sâu về bảo mật hệ thống
-
----
