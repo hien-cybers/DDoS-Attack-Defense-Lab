@@ -52,7 +52,7 @@ sudo sysctl -w net.ipv4.tcp_max_syn_backlog=4096
 
 # Giảm số lần Server cố gắng truyền lại gói SYN-ACK
 sudo sysctl -w net.ipv4.tcp_synack_retries=2
-
+--
 ### 3.2. Chống HTTP Flood bằng Iptables Connlimit (Layer 7)
 Giải pháp: Tấn công HTTP Flood sử dụng các kết nối TCP hoàn toàn hợp lệ, do đó cơ chế SYN Cookies ở trên sẽ bị qua mặt. Để phòng thủ, hệ thống triển khai Tường lửa iptables kết hợp với module connlimit nhằm bóp nghẹt số lượng kết nối đồng thời từ một địa chỉ IP.
 
