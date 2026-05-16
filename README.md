@@ -1,201 +1,186 @@
 # 🛡️ DoS/DDoS Attack Simulation & Defense Lab
 
-**Author:** [@hien-cybers](https://github.com/hien-cybers)
-
+**Author:** [@hien-cybers](https://github.com/hien-cybers)  
 **Role:** Red Team (Attacker) & Blue Team (Defender)
 
 ---
 
-## ⚠️ DISCLAIMER / MIỄN TRỪ TRÁCH NHIỆM
+## ⚠️ DISCLAIMER
 
-Dự án này được tạo ra **ĐỘC QUYỀN cho mục đích học tập, giáo dục và nghiên cứu an toàn hệ thống (Educational Purposes Only)**.
+This project is created **EXCLUSIVELY for educational purposes, academic learning, and system security research**. 
 
-Mọi hành vi sử dụng mã nguồn trong kho chứa này để tấn công các hệ thống thực tế mà không có sự cho phép bằng văn bản là vi phạm pháp luật.
+Any unauthorized execution of the source code contained in this repository against real-world production systems without prior written consent is strictly illegal. 
 
-**Tác giả không chịu trách nhiệm cho bất kỳ sự lạm dụng nào.**
-
----
-
-## 📖 Tổng quan dự án (Project Overview)
-
-Dự án Lab này mô phỏng các kịch bản tấn công **Từ chối dịch vụ (DoS/DDoS)** nhắm vào Web Server, đồng thời triển khai các biện pháp phòng thủ hiệu quả bằng Tường lửa và tinh chỉnh nhân Linux.
-
-### 🔁 Quy trình kiểm thử gồm 2 pha:
-
-* **Red Team:**
-
-  * Viết script Python tấn công:
-
-    * Layer 4 (Transport)
-    * Layer 7 (Application)
-
-* **Blue Team:**
-
-  * Triển khai các cơ chế phòng thủ:
-
-    * Kernel Tuning (TCP SYN Cookies)
-    * Rate Limiting (Giới hạn tốc độ kết nối)
+**The author assumes no liability or responsibility for any misuse or damage caused by this tool.**
 
 ---
 
-## 🏗️ Kiến trúc Hệ thống Lab (Topology)
+## 📖 Project Overview
 
-* **Máy Tấn công (Attacker):**
+This lab environment simulates various **Denial of Service (DoS/DDoS)** attack scenarios targeting a production Web Server, while concurrently deploying robust mitigation strategies via firewall engineering and Linux kernel tuning.
 
-  * Kali Linux
-  * Công cụ: Python3, Scapy, Multi-threading Socket
+### 🔁 The Lab Workflow Consists of 2 Phases:
 
-* **Máy Nạn nhân (Victim):**
+* **Red Team (Attacker):**
+  * Developing custom Python-based exploit scripts targeting:
+    * Layer 4 (Transport Layer)
+    * Layer 7 (Application Layer)
 
-  * Ubuntu Server 24.04
-  * Dịch vụ: Apache2 Web Server
-
-* **Công cụ giám sát:**
-
-  * Wireshark
-  * htop
-  * netstat
-  * iptables
+* **Blue Team (Defender):**
+  * Implementing advanced mitigation and defensive controls:
+    * Linux Kernel Tuning (TCP SYN Cookies)
+    * Rate Limiting & Connection Threshold Controls
 
 ---
 
-## ⚔️ Kịch bản 1: Tấn công SYN Flood (Layer 4)
+## 🏗️ Lab Topology & Architecture
 
-### 🧠 Nguyên lý
+* **Attacker Infrastructure:**
+  * Operating System: Kali Linux
+  * Tooling: Python3, Scapy Engine, Multi-threaded Sockets
 
-Khai thác cơ chế bắt tay 3 bước (3-way handshake) của TCP:
+* **Victim Infrastructure:**
+  * Operating System: Ubuntu Server 24.04 LTS
+  * Service: Apache2 Web Server
 
-1. Attacker gửi hàng loạt gói `SYN`
-2. Server phản hồi `SYN-ACK`
-3. Attacker **không gửi ACK**
+* **Monitoring & Analysis Suite:**
+  * Wireshark (Packet Inspection)
+  * htop (Resource Monitoring)
+  * netstat (Session Triage)
+  * iptables (Firewall Management)
 
-➡️ Server giữ kết nối ở trạng thái `SYN_RECV` → **cạn RAM**
+---
 
-### 🛠️ Công cụ sử dụng
+## ⚔️ Scenario 1: TCP SYN Flood Attack (Layer 4)
+
+### 🧠 Core Principle
+
+This scenario exploits the structural mechanics of the standard TCP 3-Way Handshake:
+
+1. The Attacker floods the target with a high volume of `SYN` packets.
+2. The Server responds to each request with a corresponding `SYN-ACK` packet.
+3. The Attacker deliberately **withholds the final `ACK`** packet.
+
+➡️ The Server is forced to maintain thousands of half-open connections in the `SYN_RECV` state ➡️ **Total RAM exhaustion/Backlog queue starvation**.
+
+### 🛠️ Tools Used
 
 ```bash
-syn_flood.py  # Script custom sử dụng Scapy
+syn_flood.py  # Custom Python exploit script leveraging the Scapy network stack
 ```
 
-### 📊 Kết quả nghiệm thu
+### 📊 Post-Attack Verification / Results
 
-* Server bị ngập kết nối `SYN_RECV`
-* Hàng đợi kết nối bị quá tải
-* Tài nguyên hệ thống suy giảm mạnh
+* The target server becomes heavily saturated with unresolved `SYN_RECV` states.
+* The TCP connection backlog queue becomes fully saturated.
+* Critical system resource degradation occurs, rejecting legitimate connections.
 
 <img width="1601" height="818" alt="6" src="https://github.com/user-attachments/assets/c9395be6-6e31-40eb-a53e-e0b0fbaae17e" />
 
 ---
 
-## ⚔️ Kịch bản 2: Tấn công HTTP Flood (Layer 7)
+## ⚔️ Scenario 2: HTTP Flood Attack (Layer 7)
 
-### 🧠 Nguyên lý
+### 🧠 Core Principle
 
-* Sử dụng **multi-threading**
-* Tạo hàng nghìn request HTTP hợp lệ (`GET`)
-* Ép Server xử lý liên tục → CPU 100%
+* Leverages high-concurrency **multi-threading** execution models.
+* Generates thousands of application-layer valid HTTP `GET` requests simultaneously.
+* Forces the Web Server into heavy processing loops (I/O and rendering overhead) ➡️ **100% CPU exhaustion**.
 
-### 🛠️ Công cụ sử dụng
+### 🛠️ Tools Used
 
 ```bash
-http_flood.py  # Script Python sử dụng socket
+http_flood.py  # Custom Python multi-threaded script using low-level sockets
 ```
 
-### 📊 Kết quả nghiệm thu
+### 📊 Post-Attack Verification / Results
 
-* CPU đạt 100%
-* Load Average tăng cao
-* Web Server phản hồi chậm hoặc ngừng hoạt động
+* CPU utilization spikes instantly to 100%.
+* System Load Average surpasses critical baseline thresholds.
+* The Web Server experiences massive response latency or drops offline entirely.
 
 <img width="1698" height="920" alt="Screenshot 2026-03-26 124754" src="https://github.com/user-attachments/assets/0b656c5d-6017-47f4-b965-ec1aa44cd561" />
 
 ---
 
-## 🛡️ Kịch bản 3: Phòng thủ Hệ thống (Blue Team)
+## 🛡️ Scenario 3: Defensive Engineering (Blue Team)
 
 ---
 
-### 🔐 3.1. Chống SYN Flood bằng Kernel Tuning (Layer 4)
+### 🔐 3.1. Mitigating SYN Floods via Kernel Tuning (Layer 4)
 
-### 💡 Giải pháp
+### 💡 Mitigation Strategy
 
-Kích hoạt cơ chế **TCP SYN Cookies**:
+Activating the **TCP SYN Cookies** defense mechanism:
 
-* Không cấp phát RAM ngay khi nhận SYN
-* Tạo cookie mã hóa
-* Chỉ thiết lập kết nối khi client phản hồi hợp lệ
+* The kernel stops allocating space in the RAM backlog immediately upon receiving a `SYN` packet.
+* Instead, it generates a cryptographically signed cookie inside the TCP sequence number sent back.
+* System resources are allocated only when a valid final `ACK` verifying that cookie is returned by the client.
 
-➡️ **Vô hiệu hóa IP spoofing**
+➡️ **Effectively neutralizes IP spoofing and half-open resource depletion.**
 
-### ⚙️ Cấu hình sysctl
+### ⚙️ Sysctl Kernel Configuration
 
 ```bash
-# Bật SYN Cookies
+# Enable TCP SYN Cookies
 sudo sysctl -w net.ipv4.tcp_syncookies=1
 
-# Tăng backlog queue
+# Maximize the SYN backlog queue capacity
 sudo sysctl -w net.ipv4.tcp_max_syn_backlog=4096
 
-# Giảm số lần retry SYN-ACK
+# Restrict SYN-ACK retry limits to drop dead connections faster
 sudo sysctl -w net.ipv4.tcp_synack_retries=2
 ```
 
 ---
 
-### 🌐 3.2. Chống HTTP Flood bằng Iptables Connlimit (Layer 7)
+### 🌐 3.2. Mitigating HTTP Floods via Iptables Connlimit (Layer 7)
 
-### 💡 Giải pháp
+### 💡 Mitigation Strategy
 
-HTTP Flood sử dụng kết nối hợp lệ → không chặn bằng SYN Cookies được.
+Because Layer 7 HTTP Floods use fully established, valid TCP connections, Layer 4 SYN Cookies cannot detect them.
 
-➡️ Dùng:
-
-* `iptables`
-* `connlimit module`
-
-👉 Giới hạn số kết nối đồng thời / IP
+➡️ **Solution:**
+Deploy the native Linux Netfilter firewall (`iptables`) paired with the `connlimit` module to enforce a strict threshold on concurrent HTTP TCP channels per unique IP address.
 
 ---
 
-### ⚙️ Cấu hình Iptables
+### ⚙️ Iptables Firewall Configuration
 
 ```bash
-# Drop IP có hơn 20 kết nối đồng thời vào port 80
+# Drop any inbound traffic from an individual IP exceeding 20 concurrent connections on Port 80
 sudo iptables -A INPUT -p tcp --dport 80 -m connlimit --connlimit-above 20 -j DROP
 ```
 
 ---
 
-### 📊 Kết quả nghiệm thu
+### 📊 Defensive Verification / Results
 
-* IP spam request bị chặn ngay lập tức
-* Giảm tải hệ thống rõ rệt:
-
-  * CPU từ 100% → ổn định
-* Web Server hoạt động lại bình thường
-* Quan sát qua `htop`:
-
-  * Hệ thống mượt
-  * Không còn nghẽn tài nguyên
+* Aggressive request spammers are immediately dropped at the network firewall layer.
+* Massive reduction in infrastructure overhead:
+  * CPU usage drops from 100% saturation back to baseline stability.
+* Web Server operational performance and availability are fully restored.
+* Live monitoring via `htop` indicates:
+  * Fluid system processing loops.
+  * Total resolution of hardware resource starvation.
 
 ---
 
-## ✅ Tổng kết
+## ✅ Summary Matrix
 
-| Kịch bản   | Loại tấn công | Giải pháp          |
-| ---------- | ------------- | ------------------ |
-| SYN Flood  | Layer 4       | SYN Cookies        |
-| HTTP Flood | Layer 7       | Iptables Connlimit |
+| Scenario | Attack Vector | Mitigation Strategy |
+| :--- | :--- | :--- |
+| **SYN Flood** | Layer 4 (Transport) | TCP SYN Cookies & Backlog Queue Tuning |
+| **HTTP Flood** | Layer 7 (Application) | Netfilter Iptables Connlimit Adjustments |
 
 ---
 
-## 🚀 Gợi ý mở rộng
+## 🚀 Future Roadmap & Hardening
 
-* Thêm `fail2ban` để tự động block IP
-* Sử dụng `nginx rate limiting`
-* Triển khai WAF (Web Application Firewall)
-* Test với công cụ:
-
+* Implement `fail2ban` jail integration for automated, dynamic malicious IP banning.
+* Deploy Layer 7 rate-limiting directly at the reverse proxy layer using `nginx`.
+* Integrate a Web Application Firewall (WAF) to inspect malicious HTTP payload structures.
+* Expand stress-testing coverage using advanced performance tools:
   * `hping3`
-  * `ab (Apache Benchmark)`
+  * `ab` (Apache Benchmark)
   * `locust`
